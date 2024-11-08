@@ -1,8 +1,10 @@
 import "./App.css";
+import Image from "./quotebook.png";
 
 function App() {
 	return (
 		<div className="App">
+			<img src={Image} width="100px" alt="quote book" />
 			{/* TODO: include an icon for the quote book */}
 			<h1>Hack at UCI Tech Deliverable</h1>
 
