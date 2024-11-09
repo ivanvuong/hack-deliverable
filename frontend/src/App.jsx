@@ -36,7 +36,7 @@ function App() {
 
   const fetchQuotes = async () => {
     try {
-      const response = await fetch("http://localhost:5173/api/quote");
+      const response = await fetch(`http://localhost:5173/api/quote?max_age=${time}`);
       if (!response.ok) {
         throw new Error("Failed to fetch quotes");
       }
@@ -53,8 +53,12 @@ function App() {
   };
 
   useEffect(() => {
-    fetchQuotes();
-  }, []);
+    if (time) {
+      fetchQuotes();
+    } else {
+      fetchQuotes();
+    }
+  }, [time]);
 
   const parseTime = (time) => {
     const date = new Date(time);
@@ -94,16 +98,16 @@ function App() {
           type="text"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          placeholder="Type your quote here..."
+          placeholder="Enter time (e.g., 2024-11-08T19:00:00)"
         />
       </label>
-
+	  
       <h3>Submitted Quotes:</h3>
       <button onClick={resetQuotes}>Reset Quotes</button>
       <ul>
         {quotes.map((quote, index) => (
           <li key={index}>
-            "{quote.message}" - {quote.name} at {parseTime(quote.time)}
+            "{quote.message}" - {quote.name} {parseTime(quote.time)}
           </li>
         ))}
       </ul>
