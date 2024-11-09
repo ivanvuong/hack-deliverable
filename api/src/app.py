@@ -54,5 +54,4 @@ def get_quotes() -> list[Quote]:
     """
     return database["quotes"]
 
-
 # TODO: add another API route with a query parameter to retrieve quotes based on max age
