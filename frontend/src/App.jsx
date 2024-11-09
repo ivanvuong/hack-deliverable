@@ -6,9 +6,10 @@ function App() {
   const [quotes, setQuotes] = useState([]);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
+  const [time, setTime] = useState("");
 
   const submitQuote = async (event) => {
-    event.preventDefault();  
+    event.preventDefault();
     const formData = new FormData();
     formData.append("name", name);
     formData.append("message", message);
@@ -16,14 +17,14 @@ function App() {
     try {
       const response = await fetch("http://localhost:5173/api/quote", {
         method: "POST",
-        body: formData, 
+        body: formData,
       });
 
       if (response.ok) {
         console.log("Quote submitted successfully");
-        setName(""); 
-        setMessage(""); 
-        fetchQuotes(); 
+        setName("");
+        setMessage("");
+        fetchQuotes();
       } else {
         const errorData = await response.json();
         console.error("Error submitting quote:", errorData);
@@ -35,20 +36,30 @@ function App() {
 
   const fetchQuotes = async () => {
     try {
-      const response = await fetch('http://localhost:5173/api/quote');
-	  console.log(response)
+      const response = await fetch("http://localhost:5173/api/quote");
       if (!response.ok) {
-        throw new Error('Failed to fetch quotes');
+        throw new Error("Failed to fetch quotes");
       }
       const data = await response.json();
-      setQuotes(data);
+	  const sortedData = data.sort((a, b) => new Date(b.time) - new Date(a.time));
+      setQuotes(sortedData);
     } catch (error) {
-      console.error('Error fetching quotes:', error);
+      console.error("Error fetching quotes:", error);
     }
   };
+
+  const resetQuotes = () => {
+    setQuotes([]); // Reset the quotes state
+  };
+
   useEffect(() => {
-    fetchQuotes(); 
+    fetchQuotes();
   }, []);
+
+  const parseTime = (time) => {
+    const date = new Date(time);
+    return date.toLocaleString();
+  };
 
   return (
     <div className="App">
@@ -78,11 +89,21 @@ function App() {
         <button type="submit">Submit</button>
       </form>
 
+      <label>
+        <input
+          type="text"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          placeholder="Type your quote here..."
+        />
+      </label>
+
       <h3>Submitted Quotes:</h3>
+      <button onClick={resetQuotes}>Reset Quotes</button>
       <ul>
         {quotes.map((quote, index) => (
           <li key={index}>
-            "{quote.message}" - {quote.name} at {quote.time}
+            "{quote.message}" - {quote.name} at {parseTime(quote.time)}
           </li>
         ))}
       </ul>
