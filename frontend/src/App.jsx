@@ -1,6 +1,7 @@
-import "./App.css";
-import Image from "./quotebook.png";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import './App.css';
+import Image from './quotebook.png';
+import QuoteList from './components/QuoteList';  // Import QuoteList component
 
 function App() {
   const [quotes, setQuotes] = useState([]);
@@ -41,15 +42,10 @@ function App() {
         throw new Error("Failed to fetch quotes");
       }
       const data = await response.json();
-	  const sortedData = data.sort((a, b) => new Date(b.time) - new Date(a.time));
-      setQuotes(sortedData);
+      setQuotes(data);
     } catch (error) {
       console.error("Error fetching quotes:", error);
     }
-  };
-
-  const resetQuotes = () => {
-    setQuotes([]); // Reset the quotes state
   };
 
   useEffect(() => {
@@ -60,17 +56,29 @@ function App() {
     }
   }, [time]);
 
-  const parseTime = (time) => {
-    const date = new Date(time);
-    return date.toLocaleString();
+  const stringTime = (time) => {
+    const datetime = time.split(" ");
+    if (datetime.length === 2) {
+      return `${datetime[0]}T${datetime[1]}`;
+    }
+    return time; 
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setTime(stringTime(value));
   };
 
   return (
     <div className="App">
       <img src={Image} width="100px" alt="quote book" />
-      <h1>Hack at UCI Tech Deliverable</h1>
+      <div>
+        <div className="text-center">
+          <h1 className="text-2xl">Hack at UCI Quotebook</h1>
+        </div>
+      </div>
 
-      <h2>Submit a quote</h2>
+      <h2>Submit a quote:</h2>
       <form onSubmit={submitQuote}>
         <label>
           Name
@@ -97,20 +105,19 @@ function App() {
         <input
           type="text"
           value={time}
-          onChange={(e) => setTime(e.target.value)}
-          placeholder="Enter time (e.g., 2024-11-08T19:00:00)"
+          onChange={handleChange}
+          placeholder="Enter time (e.g., 2024-11-08 19:00:00)"
+          style={{
+            width: '350px',
+            height: '40px',
+            fontSize: '18px',
+            padding: '10px',
+          }}
         />
       </label>
-	  
+
       <h3>Submitted Quotes:</h3>
-      <button onClick={resetQuotes}>Reset Quotes</button>
-      <ul>
-        {quotes.map((quote, index) => (
-          <li key={index}>
-            "{quote.message}" - {quote.name} {parseTime(quote.time)}
-          </li>
-        ))}
-      </ul>
+      <QuoteList quotes={quotes} />
     </div>
   );
 }
